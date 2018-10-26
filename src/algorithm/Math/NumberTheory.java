@@ -173,34 +173,6 @@ public class NumberTheory {
     }
     //--------------------------------------------------------------------------------------------------------------------------------------------------------
     /**
-     *得到a*b超出long的部分
-     */
-    public long getMulHigh(long a,long b){
-        long a1 = a >>> 32;
-        long a0 = a & 0xFFFFFFFFL;
-        long b1 = b >>> 32;
-        long b0 = b & 0xFFFFFFFFL;
-        long ans1 = a0 * b1 + a1 * b0 + (a0 * b0 >>> 32);
-        return a1 * b1 + (ans1 >>> 32);
-    }
-    /**
-     *得到a，b无符号相乘超出long的部分
-     */
-    public long getUnsignedMulHigher(long a,long b){
-        long a1 = a >>> 32;
-        long a0 = a & 0xFFFFFFFFL;
-        long b1 = b >>> 32;
-        long b0 = b & 0xFFFFFFFFL;
-        long ans1 = a0 * b1 + (a0 * b0 >>> 32);
-        long ans2=a1 * b1;
-        ans2+=(ans1 >>> 32);
-        ans1&=0xFFFFFFFFL;
-        ans1+=a1 * b0;
-        ans2+=(ans1 >>> 32);
-        return ans2;
-    }
-    //--------------------------------------------------------------------------------------------------------------------------------------------------------
-    /**
      * Miller-Rabin素性测试，快速判断素数，误判概率为(1/4)^t
      * @param n    要判断的数
      * @param t    判断轮数
@@ -243,30 +215,5 @@ public class NumberTheory {
             y=(y*y)%p;
         }
         return (int)x;
-    }
-    //--------------------------------------------------------------------------------------------------------------------------------------------------------
-    /**
-     * 卡马克快速平方根
-     * 求1/sqrt(x)近似值，java中float与int转化过慢，仅供参考
-     */
-    public static float InvSqrt(float x){
-        float xhalf=0.5f*x;
-        int i=Float.floatToRawIntBits(x);
-        i=0x5f375a86 - (i>>1);
-        x=Float.intBitsToFloat(i);
-        x=x*(1.5f-xhalf*x*x);
-        return x;
-    }
-    /**
-     * 卡马克快速平方根
-     * 求1/sqrt(x)近似值，java中double与long转化过慢，仅供参考
-     */
-    public static double InvSqrt(double x){
-        double xhalf=0.5*x;
-        long i=Double.doubleToRawLongBits(x);
-        i=0x5fe6ec85e7de30daL - (i>>1);
-        x=Double.longBitsToDouble(i);
-        x=x*(1.5-xhalf*x*x);
-        return x;
     }
 }
