@@ -7,7 +7,7 @@ import java.math.BigInteger;
  */
 public class Montgomery {
     private long mod,inv,r2;
-    private static BigInteger MAX=BigInteger.valueOf(1L<<32).pow(4);
+    private static BigInteger MAX=BigInteger.ONE.shiftLeft(128);
     //需要先把数字转化为Montgomery表示法
     public long toMontForm(long n){
         return reduce(n,r2);
@@ -18,7 +18,7 @@ public class Montgomery {
         inv=m;
         for(int i=0;i<5;i++) inv *= 2 - inv * m;
         BigInteger M=BigInteger.valueOf(m);
-        r2=MAX.subtract(M).mod(M).longValue();
+        r2=MAX.mod(M).longValue();
     }
     public long reduce(long c,long d) {
         long a=getUnsignedMulHigh(c,d);

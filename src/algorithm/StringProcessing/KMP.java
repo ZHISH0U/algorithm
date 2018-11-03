@@ -33,7 +33,7 @@ public class KMP {
         final int slen= source.length(),plen= pattern.length();
         int[]next=KMPNext(pattern),extend=new int[slen];
         int i=0,j,pos=0;
-        while(source.charAt(i)== pattern.charAt(i)&&i<plen&&i<slen)i++;
+        while(i<plen&&i<slen&&source.charAt(i)== pattern.charAt(i))i++;
         extend[0]=i;
         for(i=1;i<slen;i++){
             if(next[i-pos]+i<extend[pos]+pos)//第一种情况，直接可以得到extend[i]的值

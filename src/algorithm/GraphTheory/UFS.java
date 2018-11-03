@@ -13,6 +13,10 @@ public class UFS{
 		Arrays.fill(fa,-1);
 		blocks=PointNum;
 	}
+
+	/**
+	 * combine part b onto part a
+	 */
 	public void combine(int a,int b){
 		int a_fa=find(a);
 		int b_fa=find(b);
@@ -28,9 +32,8 @@ public class UFS{
 	 */
 	public int find(int aim){
 		int temp=aim,a;
-		while(fa[temp]!=-1){
+		while(fa[temp]!=-1)
 			temp=fa[temp];
-		}
 		while(fa[aim]!=-1){
 			a=aim;
 			aim=fa[aim];
@@ -39,12 +42,10 @@ public class UFS{
 		return temp;
 	}
 	/**
-	 * combine x with y
-	 * @param x
-	 * @param y
+	 * combine vertex y onto vertex x
 	 */
-	private void comb(int x,int y){
-		fa[x]=y;
+	public void comb(int x,int y){
+		fa[y]=x;
 	}
 	public int getBlocks(){
 		return blocks;
