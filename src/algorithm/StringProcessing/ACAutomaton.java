@@ -1,6 +1,6 @@
 package algorithm.StringProcessing;
 
-import com.fyx.lib.algorithm.DataStructure.Trie;
+import algorithm.DataStructure.Trie;
 
 import java.util.LinkedList;
 import java.util.Queue;

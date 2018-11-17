@@ -1,9 +1,15 @@
 package algorithm.RandomSearch;
 
+/**
+ * 遗传退火
+ */
 public abstract class GeneticAlgorithm <G> {
     G[] p;
     Object[][] pools;
     int cur;
+    double SelectRange=0.6;//锦标赛选择的范围，0.6~0.8效果较好
+    double bound=Math.PI/4;//自适应调整改变的边界
+    double Kt=5;//温度参数
     public GeneticAlgorithm(){
         cur=0;
         pools=new Object[2][];
@@ -23,37 +29,40 @@ public abstract class GeneticAlgorithm <G> {
             p[i]=newGene();
             pools[1][i]=newGene();
         }
-        double bound=Math.PI/6;
         G res=newGene();
         clone(p[0],res);
-        label:while(fit(res)<maxFit){
-            double avg=0,Pc,Pm;
+        while(fit(res)<maxFit){
+            double avg=0;
+            G max=p[0];
             for (G a : p) {//寻找最优个体
                 double tmp = fit(a);
                 avg += tmp;
-                if (tmp > fit(res))
-                    clone(a,res);
+                if (tmp > fit(max))
+                    max=a;
             }
+            if(fit(max)<fit(res)){//保留精英策略
+                G r=rand();
+                avg+=fit(res)-fit(r);
+                clone(res,r);
+            } else clone(max,res);
             avg/=p.length;
-            double x=Math.asin(avg/fit(res)),y=2*x/Math.PI;
+            if(avg>=fit(res))avg=fit(res)-1e-16;
+            double x=Math.asin(avg/fit(res)),y=2*x/Math.PI,Pc,Pm,T;
+            Pc=Kc*y;Pm=Km*y;T=Kt*maxFit*y/fit(res);
             if(x<bound){//自适应调整
-                Pc=Kc*y;
-                Pm=Km*(1-y);
-                Crs(Pc);Mut(Pm);
+                Pm=Km-Pm;
+                Crs(Pc);Mut(Pm,T);
             }else {
-                Pc=Kc*(1-y);
-                Pm=Km*y;
-                Mut(Pm);Crs(Pc);
+                Pc=Kc-Pc;
+                Mut(Pm,T);Crs(Pc);
             }
             p=select();
-            for(G a:p) if(fit(a)>=fit(res))continue label;
-            clone(res,p[randPos()]);//保留精英
         }
         return res;
     }
     protected G[] select(){
         G[]p=newPool();
-        int size=(int)(p.length*0.6);//0.6~0.8效果较好
+        int size=(int)(p.length*SelectRange);
         for(int i=0;i<p.length;i++){//锦标赛选择策略
             G winner=rand();
             for(int j=0;j<size;j++)
@@ -66,23 +75,21 @@ public abstract class GeneticAlgorithm <G> {
         for(int i=0;i<p.length;i++)//随机两个个体进行交叉
             if(Math.random()<P)crossover(rand(),rand());
     }
-    private void Mut(double P){
+    private void Mut(double P,double T){
         G tmp=newGene();
         for (G a : p)
             if (Math.random() < P){
                 clone(a,tmp);mutate(tmp);
-                //退火式变异。由于保留了精英，所以适应度低的个体加速收敛，适应度高的个体增加多样性
-                if(accept(fit(tmp)-fit(a),fit(a)*10))clone(tmp,a);
+                //退火式变异。由于保留了精英，所以适应度低的个体变异率低加速收敛，适应度高的个体变异率高增加多样性
+                //并由适应度集中程度决定温度的基础值
+                if(accept(fit(tmp)-fit(a),T*fit(a)))clone(tmp,a);
             }
     }
     private static boolean accept(double dF,double T){
         return dF>=0||Math.random()<Math.exp(dF/T);
     }
     private G rand(){
-        return p[randPos()];
-    }
-    private int randPos(){
-        return (int)(Math.random()*p.length);
+        return p[(int)(Math.random()*p.length)];
     }
     private G compet(G a,G b){
         if(fit(a)>fit(b))return a;

@@ -129,6 +129,62 @@ public class NumberalCalculations {
     }
     //--------------------------------------------------------------------------------------------------------------------------------------------------------
     /**
+     * 四阶龙格-库塔公式求一阶常微分方程,适合平滑曲线
+     * @param initX 初始点
+     * @param initY 初值
+     * @param endX 目标点
+     * @param time 迭代次数
+     * @return
+     */
+    public static double RungeKutta(double initX,double initY,double endX,int time){
+        double h=(endX-initX)/time;
+        double y=initY,x=initX;
+        time--;
+        for(int i=0;i<time;i++){
+            y=R_K(x,y,h);
+            x+=h;
+        }
+        h=endX-x;
+        return R_K(x,y,h);
+    }
+    private static double R_K(double x,double y,double h){
+        double k1,k2,k3,k4;
+        k1=func(x,y);
+        k2=func(x+h/2,y+h*k1/2);
+        k3=func(x+h/2,y+h*k2/2);
+        k4=func(x+h,y+h*k3);
+        return y+h*(k1+2*k2+2*k3+k4)/6;
+    }
+
+    /**
+     * 改进欧拉公式，非平滑曲线可能由于龙格-库塔公式
+     * @param initX 初始点
+     * @param initY 初值
+     * @param endX 目标点
+     * @param time 迭代次数
+     * @return
+     */
+    public static double improveEuler(double initX,double initY,double endX,int time){
+        double h=(endX-initX)/time;
+        double y=initY,x=initX;
+        time--;
+        for(int i=0;i<time;i++){
+            y=I_E(x,y,h);
+            x+=h;
+        }
+        h=endX-x;
+        return I_E(x,y,h);
+    }
+    private static double I_E(double x,double y,double h){
+        double yp=y+h*func(x,y);
+        double yc=y+h*func(x+h,yp);
+        return (yp+yc)/2;
+    }
+    public static double func(double x,double y){
+        return x;
+    }
+    //--------------------------------------------------------------------------------------------------------------------------------------------------------
+    /**
      *得到a*b超出long的部分
      */
     public long getMulHigh(long a,long b){

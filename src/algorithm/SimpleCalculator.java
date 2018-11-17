@@ -6,6 +6,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.Stack;
 
+/**
+ * 暂时无法处理空格和负号
+ */
 public class SimpleCalculator {
     Stack<Operator> OperStack=new Stack<>();//运算符临时栈
     Stack<Num> NumStack=new Stack<>();//操作数临时栈

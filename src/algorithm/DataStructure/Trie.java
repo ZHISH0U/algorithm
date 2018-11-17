@@ -2,6 +2,7 @@ package algorithm.DataStructure;
 
 /**
  * 字典树
+ * 对于字符范围大但稀疏的字典树，可采用左儿子右兄弟的结构
  */
 public abstract class Trie {
     protected TrieNode root;
