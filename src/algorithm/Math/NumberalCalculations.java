@@ -105,7 +105,7 @@ public class NumberalCalculations {
      * @param delta 误差
      */
     public static double Romberg(double a,double b,double delta){
-        double d=b-a,list[]=new double[20];
+        double d=b-a,list[]=new double[31];
         list[0]=(func(a)+func(b))*d/2;
         for(int i=1;;i++){
             double ans=0,t,x=a+d/2;

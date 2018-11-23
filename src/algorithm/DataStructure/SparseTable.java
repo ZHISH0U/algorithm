@@ -18,7 +18,7 @@ public abstract class SparseTable {
         return get(dp[l][k],dp[r-(1<<k)+1][k]);
     }
     private int log2(int n){
-        return (int)(Math.log(n)/Math.log(2));
+        return 31-Integer.numberOfLeadingZeros(n);
     }
     public abstract int get(int a,int b);
 }
