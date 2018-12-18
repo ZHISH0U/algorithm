@@ -4,7 +4,7 @@ package algorithm.StringProcessing;
  * 后缀自动机，right改为位置后buildRight可得right集合
  */
 public class SuffixAutomaton {
-    private final char base='a',EndChar='z'+1;
+    private final char base='a';
     private State root,strLast,topoLast;
     private int size;
     public SuffixAutomaton(){
@@ -14,7 +14,7 @@ public class SuffixAutomaton {
     public SuffixAutomaton build(String s) {
         strLast=root;
         for (char c : s.toCharArray()) put(c);
-        put(EndChar);//加入一个结尾字符，构建广义SAM时防止多个串连在一起
+   //     put(EndChar);//加入一个结尾字符，构建广义SAM时防止多个串连在一起
         return this;
     }
     public void put(char c){
@@ -66,7 +66,7 @@ public class SuffixAutomaton {
     public class State {
         int length,right=0;
         State link,topo;//right集合的父集，拓扑序的前一个
-        private State[] next = new State[27];
+        private State[] next = new State[26];
         public State(int len){
             length=len;
         }

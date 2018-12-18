@@ -7,7 +7,7 @@ import java.util.List;
  * 树链剖分，将树状图划分为多条链，进行区间维护，亦可求最小公共祖先。
  * 边权可将边对应到指向的节点上，转化为点权。
  */
-public class TreeChain{
+public class LinkCutTree {
     private List<Integer>[]edge;
     //weight:节点的权重，top:节点所在链的顶端，deep:节点的深度
     //son:节点的重子节点，father:节点的父节点
@@ -15,7 +15,7 @@ public class TreeChain{
     private int[] w,tp,dp,sn,fa,id,rk;
     private int size=0;
     //edges:边的集合，root:根节点
-    public TreeChain(List<Integer>[] edges,int root){
+    public LinkCutTree(List<Integer>[] edges, int root){
         this.edge=edges;
         w=new int[edges.length];
         tp=new int[edges.length];

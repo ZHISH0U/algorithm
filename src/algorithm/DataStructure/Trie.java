@@ -9,21 +9,29 @@ public abstract class Trie {
     public Trie(){
         root=getNode();
     }
-    public Trie put(String... strs){
-        for(String str:strs)
-            put(str.toCharArray());
-        return this;
-    }
-    public TrieNode put(char[] str){
-        return put(str,0,str.length);
-    }
-    public TrieNode put(char[] str,int beginIndex,int endIndex){
+    public TrieNode put(String str,int beginIndex,int endIndex){
         TrieNode node;
         node=root;
         for(int i=beginIndex;i<endIndex;i++)
-            node=node.put(str[i]);
+            node=node.put(str.charAt(i));
         node.EndNum++;
         return node;
+    }
+    public TrieNode get(String s){
+        TrieNode node=root;
+        for(int i=0;i<s.length();i++){
+            if(!node.contains(s.charAt(i)))return null;
+            else node=node.get(s.charAt(i));
+        }
+        return node;
+    }
+    public Trie put(String... strs){
+        for(String str:strs)
+            put(str);
+        return this;
+    }
+    public TrieNode put(String str){
+        return put(str,0,str.length());
     }
     public TrieNode root(){
         return root;

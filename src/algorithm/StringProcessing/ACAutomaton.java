@@ -1,47 +1,41 @@
 package algorithm.StringProcessing;
 
-import algorithm.DataStructure.Trie;
-
 import java.util.LinkedList;
 import java.util.Queue;
 
 public class ACAutomaton {
-    private Trie trie;
+    private Node root;
     private char base='a';
     public ACAutomaton(){
-        trie=new Trie() {
-            @Override
-            public TrieNode getNode() {
-                return new AC_Node();
-            }
-        };
+        root=new Node();
     }
     public void put(String pattern){
-        trie.put(pattern);
+        Node cur=root;
+        for(int i=0;i<pattern.length();i++)
+            cur=cur.put(pattern.charAt(i));
+        cur.endNum++;
     }
     /**
      * 匹配字符串
      */
     public void match(String source){
-        AC_Node p=(AC_Node) trie.root(),root=p,tmp;
+        Node p=root,tmp;
         for (char value : source.toCharArray()) {
             while (!p.contains(value) && p != root) p = p.fail;
             p = p.get(value);
             if (p == null) p = root;
             tmp = p;
             while (tmp != root) {
-                if(tmp.getEndNum()>0) {
-                    //匹配到模式串
-//------------在这里处理匹配到模式串后的操作------------
-                }
+                if(tmp.endNum>0) //匹配到模式串
+                    tmp.cnt++;
                 tmp=tmp.fail;
             }
         }
     }
     //生成fail指针
     private void buildFailPointer(){
-        Queue<AC_Node> queue=new LinkedList<>();
-        AC_Node tmp,t1,root=(AC_Node)trie.root();
+        Queue<Node> queue=new LinkedList<>();
+        Node tmp,t1;
         queue.add(root);
         while (!queue.isEmpty()){
             tmp=queue.poll();
@@ -60,18 +54,20 @@ public class ACAutomaton {
             }
         }
     }
-    public class AC_Node extends Trie.TrieNode{
-        private AC_Node fail;
-        private AC_Node[]next=new AC_Node[26];
-        @Override
-        public AC_Node get(char c){
+    public class Node{
+        private Node fail;
+        private int endNum=0,cnt=0;
+        private Node[]next=new Node[26];
+        public Node get(char c){
             return next[c-base];
         }
-        public AC_Node put(char c){
-            if(next[c-base]==null) next[c-base]=new AC_Node();
+        public Node put(char c){
+            if(next[c-base]==null) next[c-base]=new Node();
             return next[c-base];
         }
-        @Override
+        public int getCount(){
+            return cnt;
+        }
         public boolean contains(char c) {
             return next[c-base]!=null;
         }

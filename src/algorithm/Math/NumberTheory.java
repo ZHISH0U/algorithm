@@ -29,6 +29,20 @@ public class NumberTheory {
         }
         return a;
     }
+    public static long gcd(long a,long b) {
+        long r;
+        if(b>a){
+            long tmp=b;
+            b=a;
+            a=tmp;
+        }
+        while(b>0) {
+            r=a%b;
+            a=b;
+            b=r;
+        }
+        return a;
+    }
     /**
      * 最小公倍数
      */
@@ -107,6 +121,29 @@ public class NumberTheory {
         }
         return (int)ans;
     }
+    public static long FastPowMod(long a,long b,long c){
+        a=a%c;
+        long ans=1;
+        while(b>0){
+            if((b&1)==1) ans=mulMod(ans,a,c);
+            a=mulMod(a,a,c);
+            b>>=1;
+        }
+        return ans;
+    }
+    //long相乘取模
+    public static long mulMod(long a,long b,long c) {
+        a%=c;
+        b%=c;
+        long ret=0;
+        while(b!=0) {
+            if((b&1)!=0){ret+=a;ret%=c;}
+            a<<=1;
+            if(a>=c)a%=c;
+            b>>=1;
+        }
+        return ret;
+    }
     //--------------------------------------------------------------------------------------------------------------------------------------------------------
     /**
      * 欧拉筛法求n以内的素数，时间复杂度O(n)
@@ -149,6 +186,36 @@ public class NumberTheory {
         if(n!=1)map.put(n,1);
         return map;
     }
+    /**
+     * 大数分解质因数，时间复杂度O(n^1/4)
+     * @param n
+     * @param x 质因数数组
+     * @param len 输入0
+     * @return 质因数个数
+     */
+    public static int decomposeFactor(long n,long[]x,int len){
+        if(MillerRabin(n,20)){
+            x[len++]=n;
+            return len;
+        }
+        long p=n;
+        while(p>=n)p=Pollard_rho(n,(long)(Math.random()*n)+1);
+        len=decomposeFactor(p,x,len);
+        return decomposeFactor(n/p,x,len);
+    }
+    public static long Pollard_rho(long x,long c) {
+        long i=1,k=2;
+        long x0=(long)(Math.random()*x);
+        long y=x0;
+        while(true) {
+            i++;
+            x0=(mulMod(x0,x0,x)+c)%x;
+            long d=gcd(Math.abs(y-x0),x);
+            if(d!=1&&d!=x) return d;
+            if(y==x0) return x;
+            if(i==k){y=x0;k<<=1;}
+        }
+    }
     //--------------------------------------------------------------------------------------------------------------------------------------------------------
     /**
      * 欧拉函数，求小于n的正整数中与n互质的数的个数，时间复杂度O(n^1/2)
@@ -178,8 +245,9 @@ public class NumberTheory {
      * @param t    判断轮数
      * @return
      */
-    public static boolean MillerRabin(int n,int t)
-    {
+    public static boolean MillerRabin(long n,int t) {
+        if(n==2)return true;
+        if(n<2||(n&1)==0)return false;
         for(int i=0;i<t;i++)
             if(!isPrime(n))
                 return false;
@@ -188,33 +256,18 @@ public class NumberTheory {
     /**
      * @param n The number should be tested whether it is a prime.
      */
-    private static boolean isPrime(int n)
-    {
-        int k,q;
+    private static boolean isPrime(long n) {
+        long k,q;
         SecureRandom random=new SecureRandom();
         for(k=0;(((n-1)>>k)&1)==0;k++);
         q=(n-1)>>k;
-        int a=random.nextInt(n);
-        if(squareMultiply(a, q, n)==1)
+        long a=Math.abs(random.nextLong())%(n-1)+1;
+        if(FastPowMod(a, q, n)==1)
             return true;
         for(int j=0;j<k;j++)
-            if(squareMultiply(a, (int)Math.pow(2, j)*q,n)==n-1)
+            if(FastPowMod(a, (1<<j)*q,n)==n-1)
                 return true;
         return false;
-    }
-    private static int squareMultiply(int a,int b,int p)
-    {
-        long x=1,y=a;
-        int len=(int)Math.ceil((Math.log(b)/Math.log(2)));
-        for(int i=0;i<len;i++)
-        {
-            if(((b>>i)&1)==1)
-            {
-                x=(x*y)%p;
-            }
-            y=(y*y)%p;
-        }
-        return (int)x;
     }
     //--------------------------------------------------------------------------------------------------------------------------------------------------------
     /**
@@ -227,7 +280,7 @@ public class NumberTheory {
         n |= n >>> 4;
         n |= n >>> 8;
         n |= n >>> 16;
-        return n+1;
+        return n + 1;
     }
     /**
      * 低系统开销的前提下减少哈希冲突

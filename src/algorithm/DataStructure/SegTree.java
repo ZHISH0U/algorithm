@@ -15,20 +15,20 @@ public abstract class SegTree {
         if(initValue!=0) Arrays.fill(tree,initValue);
     }
     public void update(int pos,int val){
-        update(pos,val,start,end);
+        update(1,pos,val,start,end);
     }
     public int query(int start,int end){
         return query(1,this.start,this.end,start,end);
     }
-    protected void update(int pos,int val,int l,int r){
+    protected void update(int cur,int pos,int val,int l,int r){
         if(l==r){
-            tree[pos]=updateValue(tree[pos],val);
+            tree[cur]=updateValue(tree[cur],val);
             return;
         }
         int mid=(l+r)>>>1;
-        if(mid<pos) update(pos<<1|1,val,mid+1,r);
-        else update(pos<<1,val,l,mid);
-        tree[pos]=pushup(tree[pos<<1],tree[pos<<1|1]);
+        if(mid<pos) update(cur<<1|1,pos,val,mid+1,r);
+        else update(cur<<1,pos,val,l,mid);
+        tree[cur]=pushup(tree[cur<<1],tree[cur<<1|1]);
     }
     protected int query(int pos,int l,int r,int start,int end){
         if(l>=start&&r<=end)return tree[pos];

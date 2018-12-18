@@ -1,5 +1,7 @@
 package algorithm.StringProcessing;
 
+import java.util.Arrays;
+
 public class StringMatch {
     public static int KMP(String source,String pattern){
         return KMP.kmp(source,pattern);
@@ -79,7 +81,47 @@ public class StringMatch {
         return lp;
     }
     //--------------------------------------------------------------------------------------------------------------------------------------------------------
+    public static int ShiftAnd(String src,String pat){
+        int[]b=new int[26];
+        for(int i=0;i<pat.length();i++)
+            b[pat.charAt(i)-'a']|=1<<i;
+        int d=0,ans=1<<(pat.length()-1);
+        for(int i=0;i<src.length();i++){
+            d=(d<<1|1)&b[src.charAt(i)-'a'];
+            if((d&ans)!=0)return i-pat.length()+1;
+        }
+        return -1;
+    }
+    public static int ShiftOr(String src,String pat){
+        int[]b=new int[26];
+        Arrays.fill(b,0xffffffff);
+        for(int i=0;i<pat.length();i++)
+            b[pat.charAt(i)-'a']^=1<<i;
+        int d=0xffffffff,ans=1 << (pat.length() - 1);
+        for(int i=0;i<src.length();i++){
+            d=d<<1|b[src.charAt(i)-'a'];
+            if((d&ans)==0)return i-pat.length()+1;
+        }
+        return -1;
+    }
+    public static int BMH(String src,String pat){
+        int len=pat.length(),k=len-1;
+        int[]shift=new int[26];
+        Arrays.fill(shift,len);
+        for(int i=0;i<len-1;i++)
+            shift[pat.charAt(i)-'a']=len-i-1;
+        while(k<src.length()){
+            int j=len-1;
+            int i=k;
+            while(j>=0&&src.charAt(i)==pat.charAt(j)){
+                i--;
+                j--;
+            }
+            if(j==-1)return i+1;
+            k+=shift[src.charAt(k)-'a'];
+        }
+        return -1;
+    }
     //待完成
-    public void BMH(String source,String pattern){}
     public void Sunday(String source,String pattern){}
 }
