@@ -47,6 +47,7 @@ public class TreeST {
         for(int p:edge[cur]){
             if(p==fa)continue;
             dfs(p,cur);
+            //把末端节点的值改成祖先节点的值，免去多余的添加节点
             min[len-1]=id[cur];
         }
     }

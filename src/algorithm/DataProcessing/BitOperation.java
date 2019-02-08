@@ -1,4 +1,4 @@
-package algorithm.Math;
+package algorithm.DataProcessing;
 
 public class BitOperation {
     /**

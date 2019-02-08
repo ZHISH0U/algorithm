@@ -12,6 +12,8 @@ public abstract class IntervalPresistSegTree {
         this.end=end;
         this.initValue=initValue;
         roots=new Node[MaxVersionNum+1];
+        roots[0]=new Node(null);
+        roots[0].l=roots[0].r=roots[0];
         size=0;
     }
     public int update(int BaseVersion,int left,int right,int val){
@@ -43,7 +45,6 @@ public abstract class IntervalPresistSegTree {
         pos.val=pushup(pos.l.val,pos.r.val);
     }
     protected int query(Node pos,int l,int r,int start,int end,int lazy){
-        if(pos==null)return updateInterval(initValue,lazy,end-start+1);
         if(l>=start&&r<=end)return updateInterval(pos.val,lazy,end-start+1);
         int mid=(l+r)>>>1;
         int ans=initValue;

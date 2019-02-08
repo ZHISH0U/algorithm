@@ -157,7 +157,7 @@ public class NumberalCalculations {
     }
 
     /**
-     * 改进欧拉公式，非平滑曲线可能由于龙格-库塔公式
+     * 改进欧拉公式，非平滑曲线可能优于龙格-库塔公式
      * @param initX 初始点
      * @param initY 初值
      * @param endX 目标点
