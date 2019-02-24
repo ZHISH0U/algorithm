@@ -44,4 +44,3 @@ public abstract class SegTree {
     protected abstract int updateValue(int original,int val);
     protected abstract int pushup(int left,int right);
 }
-

@@ -67,6 +67,23 @@ public class BitOperation {
         return x;
     }
     /**
+     * x是否全为1（除前导0），0为true
+     * @param x
+     * @return
+     */
+    public static boolean AllOne(int x){
+        return (x&(x+1))==0;
+    }
+    /**
+     * x是否只有一个1
+     * @param x
+     * @return
+     */
+    public static boolean SingleOne(int x){
+        if(x==0)return false;
+        return (x&(x-1))==0;
+    }
+    /**
      * 按位逆序
      */
     public static int reverse(int x){
