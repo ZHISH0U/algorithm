@@ -21,13 +21,13 @@ public class Tarjan {
         lca=LCAs;
         vis=new boolean[edge.length];
         ufs=new UFS(edge.length);
-        dfs1(root);
+        dfs(root);
     }
-    private void dfs1(int cur){
+    private void dfs(int cur){
         vis[cur]=true;
         for(int p:edge[cur]){
             if(vis[p])continue;
-            dfs1(p);
+            dfs(p);
             ufs.comb(cur,p);
         }
         if(!query.containsKey(cur))return;

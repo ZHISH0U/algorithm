@@ -1,7 +1,7 @@
 package algorithm.StringProcessing;
 
 /**
- * 后缀自动机，right改为位置后buildRight可得right集合
+ * 后缀自动机，endpos改为位置后buildEndPos可得endpos集合
  */
 public class SuffixAutomaton {
     private final char base='a';
@@ -22,14 +22,14 @@ public class SuffixAutomaton {
         if(strLast.contains(c)){
             //广义SAM构建
             cur=strLast.get(c);
-            cur.right+=1;
+            cur.endpos+=1;
             if(strLast.length+1!=cur.length)
                 cur=addExtraState(strLast,c);
         }else {
             size++;
             cur = new State(strLast.length + 1);
             cur.topo = topoLast;
-            cur.right = 1;
+            cur.endpos = 1;
             for (p = strLast; p != null && !p.contains(c); p = p.link)
                 p.put(c, cur);
             if (p != null){
@@ -53,10 +53,10 @@ public class SuffixAutomaton {
         q.link=q.topo = clone;
         return clone;
     }
-    public void buildRight(){
+    public void buildEndPos(){
         State cur=topoLast;
         while(cur.topo!=null){
-            if(cur.link!=null)cur.link.right+=cur.right;
+            if(cur.link!=null)cur.link.endpos+=cur.endpos;
             cur=cur.topo;
         }
     }
@@ -64,7 +64,7 @@ public class SuffixAutomaton {
         return root;
     }
     public class State {
-        int length,right=0;
+        int length,endpos=0;
         State link,topo;//right集合的父集，拓扑序的前一个
         private State[] next = new State[26];
         public State(int len){
@@ -93,7 +93,7 @@ public class SuffixAutomaton {
     }
     //len为states中状态的个数，tp为拓扑排序后的数组
     public void topoSort() {
-        int[]sum=new int[MaxLen];
+        int[]sum=new int[MaxLen+1];
         State[]tp=new State[len];
         for(int i = 0; i < len; i++) sum[states[i].length]++;
         for(int i = 1; i <= MaxLen; i++) sum[i] += sum[i-1];

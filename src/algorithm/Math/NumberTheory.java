@@ -14,11 +14,6 @@ public class NumberTheory {
      */
     public static int gcd(int a,int b) {
         int r;
-        if(b>a){
-            int tmp=b;
-            b=a;
-            a=tmp;
-        }
         while(b>0) {
             r=a%b;
             a=b;
@@ -28,11 +23,6 @@ public class NumberTheory {
     }
     public static long gcd(long a,long b) {
         long r;
-        if(b>a){
-            long tmp=b;
-            b=a;
-            a=tmp;
-        }
         while(b>0) {
             r=a%b;
             a=b;
@@ -56,34 +46,24 @@ public class NumberTheory {
      * @return 第一个值为最大公约数，第二个值为x，第三个值为y
      */
     public static int[] exgcd(int a,int b){
-        int[] result;
         if(b==0) {
-            result=new int[3];
-            result[0]=a;
-            result[1]=1;
-            result[2]=0;
-            return result;
+            return new int[]{a,1,0};
         }
-        result=exgcd(b,a%b);
-        int tmp=result[1];
-        result[1]=result[2];
-        result[2]=tmp-(a/b)*result[2];
-        return result;
+        int[]res=exgcd(b,a%b);
+        int tmp=res[1];
+        res[1]=res[2];
+        res[2]=tmp-(a/b)*res[2];
+        return res;
     }
     public static long[] exgcd(long a,long b){
-        long[] result;
         if(b==0) {
-            result=new long[3];
-            result[0]=a;
-            result[1]=1;
-            result[2]=0;
-            return result;
+            return new long[]{a,1,0};
         }
-        result=exgcd(b,a%b);
-        long tmp=result[1];
-        result[1]=result[2];
-        result[2]=tmp-(a/b)*result[2];
-        return result;
+        long[]res=exgcd(b,a%b);
+        long tmp=res[1];
+        res[1]=res[2];
+        res[2]=tmp-(a/b)*res[2];
+        return res;
     }
     //--------------------------------------------------------------------------------------------------------------------------------------------------------
     /**
@@ -280,6 +260,70 @@ public class NumberTheory {
             ans=(ans%lcm+lcm)%lcm;//求最小正整数解
         }
         return (ans%lcm+lcm)%lcm;
+    }
+    //--------------------------------------------------------------------------------------------------------------------------------------------------------
+    /**
+     * 求k*a^x=b(mod m)的最小正整数解,无解返回-1，a与m互质，时间复杂度O(sqrt(m))
+     * @param k
+     * @param a
+     * @param b
+     * @param m
+     * @return
+     */
+    public static int bsgs(int k,int a,int b,int m){
+        int sq=(int)Math.ceil(Math.sqrt(m));
+        HashMap<Long,Integer>map=new HashMap<>();
+        long x=b;
+        for(int i=1;i<=sq;i++){
+            x=(x*a)%m;
+            map.put(x,i);
+        }
+        x=k;
+        long a1=FastPowMod(a,sq,m);
+        for(int i=1;i<=sq;i++){
+            x=(x*a1)%m;
+            if(map.containsKey(x))return sq*i-map.get(x);
+        }
+        return -1;
+    }
+    /**
+     * 求a^x=b(mod m)的最小正整数解，无解返回-1，不需要a与m互质，时间复杂度O(sqrt(m))
+     * @param a
+     * @param b
+     * @param m
+     * @return
+     */
+    public static int exbsgs(int a,int b,int m){
+        if(b==1)return 0;
+        int t=0,d;
+        long k=1;
+        //a^(x-1)*a/gcd = b/gcd(mod m/gcd)
+        while((d=gcd(a,m))!=1){
+            if(b%d!=0) return -1;
+            t++;b/=d;m/=d;
+            k=k*a/d%m;
+            if(b==k)return t;
+        }
+        int ans = bsgs((int)k,a,b,m);
+        if(ans==-1)return ans;
+        return ans+t;
+    }
+    /**
+     * 求a次剩余x^a=b(mod m)的解，无解返回-1，r为模m意义下的一个原根，时间复杂度O(sqrt(m))
+     * @param a
+     * @param b
+     * @param m 素数
+     * @param r 原根
+     * @return
+     */
+    public static int Residue(int a,int b,int m,int r){
+        int y=bsgs(1,r,b,m);//将b转化为r^y
+        int phi=m-1;//m为素数，欧拉函数为m-1
+        //设答案为r^x，则x*a=y(mod phi)
+        int[] gcd=exgcd(a,phi);
+        gcd[1]=(gcd[1]%phi+phi)%phi;
+        if(y%gcd[0]!=0)return -1;//y%gcd!=0无解
+        else return FastPowMod(r,(int)((long)gcd[1]*(y/gcd[0])%phi),m);
     }
     //下为较复杂数论---------------------------------------------------------------------------------------------------------------------------------------------
     /**
