@@ -1,7 +1,7 @@
 package algorithm.StringProcessing;
 
 /**
- * 后缀自动机，endpos改为位置后buildEndPos可得endpos集合
+ * 后缀自动机，endpos改为位置后buildEndpos可得endpos集合
  */
 public class SuffixAutomaton {
     private final char base='a';
@@ -22,9 +22,9 @@ public class SuffixAutomaton {
         if(strLast.contains(c)){
             //广义SAM构建
             cur=strLast.get(c);
-            cur.endpos+=1;
             if(strLast.length+1!=cur.length)
                 cur=addExtraState(strLast,c);
+            cur.endpos+=1;
         }else {
             size++;
             cur = new State(strLast.length + 1);
@@ -51,9 +51,10 @@ public class SuffixAutomaton {
         for (; p != null && p.get(c) == q; p = p.link)
             p.put(c, clone);
         q.link=q.topo = clone;
+        //clone.endpos=q.endpos;   每次put都更新父节点的endpos需要添加这行代码
         return clone;
     }
-    public void buildEndPos(){
+    public void buildEndpos(){
         State cur=topoLast;
         while(cur.topo!=null){
             if(cur.link!=null)cur.link.endpos+=cur.endpos;
@@ -65,7 +66,7 @@ public class SuffixAutomaton {
     }
     public class State {
         int length,endpos=0;
-        State link,topo;//right集合的父集，拓扑序的前一个
+        State link,topo;//endpos集合的父集，拓扑序的前一个
         private State[] next = new State[26];
         public State(int len){
             length=len;
