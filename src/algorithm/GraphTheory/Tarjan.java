@@ -1,44 +1,55 @@
 package algorithm.GraphTheory;
 
-import java.util.List;
-import java.util.Map;
+import java.util.ArrayList;
+import java.util.Stack;
 
-/**
- * Tarjan算法
- */
-public class Tarjan {
-    private List<Integer>[]edge;
-    private Map<Integer,List<Pair>>query;
-    private int root,lca[];
-    private boolean[] vis;
-    private UFS ufs;
-    public Tarjan(List<Integer>[]edges,int root){
-        edge=edges;
-        this.root=root;
+public class Tarjan{
+    ArrayList<Integer>[]edge;
+    boolean[]vis;
+    int[]dfn,low,belong;//belong为所属的联通分量的标号
+    int id=0,num=0;
+    Stack<Integer> st=new Stack<>();
+    public Tarjan(ArrayList<Integer>[]e){
+        edge=e;
+        dfn=new int[e.length];
+        low=new int[e.length];
+        belong=new int[e.length];
+        vis=new boolean[e.length];
     }
-    public void lca(Map<Integer,List<Pair>>queries,int[]LCAs){
-        query=queries;
-        lca=LCAs;
-        vis=new boolean[edge.length];
-        ufs=new UFS(edge.length);
-        dfs(root);
+
+    /**
+     * 求出强连通分量、割点，点标号从1开始
+     * 无向图桥
+     */
+    public void tarjan(){
+        for(int i=1;i<edge.length;i++){
+            if(dfn[i]==0)dfs(i,-1);
+        }
     }
-    private void dfs(int cur){
+    //有向图去掉fa，有重边的无向图遇到fa只continue一次
+    private void dfs(int cur,int fa){
+        dfn[cur]=low[cur]=++id;
+        st.add(cur);
         vis[cur]=true;
         for(int p:edge[cur]){
-            if(vis[p])continue;
-            dfs(p);
-            ufs.comb(cur,p);
+            if(p==fa)continue;
+            //child++;
+            if(dfn[p]==0){
+                dfs(p,cur);
+                low[cur]=Math.min(low[cur],low[p]);
+                //if(low[p]>=dfn[cur]) iscut[cur]=true; 求割点，改为low[p]>dfn[cur]则为割边
+            }else if(vis[p]){
+                low[cur]=Math.min(low[cur],low[p]);
+            }
         }
-        if(!query.containsKey(cur))return;
-        for(Pair p:query.get(cur))
-            if(vis[p.to]) lca[p.index]=ufs.find(p.to);
-    }
-    public static class Pair{
-        int to,index;
-        public Pair(int a,int b){
-            to=a;
-            index=b;
+
+        if(low[cur]==dfn[cur]){
+            num++;
+            while(!st.isEmpty()&&low[st.peek()]==dfn[cur]){
+                vis[st.peek()]=false;
+                belong[st.pop()]=num;
+            }
         }
+        //if(fa==-1&&child>1)iscut[cur]=true; 如果根节点，且子树的个数多于1，则根节点是割点
     }
 }
