@@ -18,46 +18,47 @@ public abstract class IntervalSegTree {
             Arrays.fill(lazy,initValue);
         }
     }
-    public void update(int left,int right,int val){
-        update(1,start,end,left,right,val);
+    public void update(int l,int r,int val){
+        update(1,start,end,l,r,val);
     }
-    public int query(int start,int end){
-        return query(1,this.start,this.end,start,end);
+    public int query(int l,int r){
+        return query(1,start,end,l,r);
     }
-    protected void update(int pos,int l,int r,int start,int end,int val){
-        if(l>=start&&r<=end){
-            tree[pos]=updateInterval(tree[pos],val,r-l+1);
-            lazy[pos]=updateValue(lazy[pos],val);
+    protected void update(int pos,int s,int t,int l,int r,int val){
+        if(s>=l&&t<=r){
+            modify(pos,s,t,val);
             return;
         }
-        pushdown(pos,r-l+1);
-        int mid=(l+r)>>>1;
-        if(start<=mid)update(pos<<1,l,mid,start,Math.min(mid,end),val);
-        if(end>mid)update(pos<<1|1,mid+1,r,Math.max(mid+1,start),end,val);
+        pushdown(pos,s,t);
+        int mid=(s+t)>>>1;
+        if(l<=mid)update(pos<<1,s,mid,l,r,val);
+        if(r>mid)update(pos<<1|1,mid+1,t,l,r,val);
         tree[pos]=pushup(tree[pos<<1],tree[pos<<1|1]);
     }
-    protected int query(int pos,int l,int r,int start,int end){
-        if(l>=start&&r<=end)return tree[pos];
-        if(lazy!=null)pushdown(pos,r-l+1);
-        int mid=(l+r)>>>1;
+    protected int query(int pos,int s,int t,int l,int r){
+        if(s>=l&&t<=r)return tree[pos];
+        if(lazy!=null)pushdown(pos,s,t);
+        int mid=(s+t)>>>1;
         int ans=initValue;
-        if(start<=mid)ans=pushup(ans,query(pos<<1,l,mid,start,end));
-        if(end>mid)ans=pushup(ans,query(pos<<1|1,mid+1,r,start,end));
+        if(l<=mid)ans=pushup(ans,query(pos<<1,s,mid,l,r));
+        if(r>mid)ans=pushup(ans,query(pos<<1|1,mid+1,t,l,r));
         return ans;
     }
-    protected void pushdown(int pos,int range){
+    protected void pushdown(int pos,int s,int t){
         if(lazy[pos]==initValue) return;
         final int tmp=lazy[pos];
-        int mid=range>>1;
-        lazy[pos << 1] = updateValue(lazy[pos << 1], tmp);
-        lazy[pos << 1 | 1] = updateValue(lazy[pos << 1 | 1], tmp);
-        tree[pos << 1] = updateInterval(tree[pos << 1], tmp, range-mid);
-        tree[pos << 1 | 1] = updateInterval(tree[pos << 1 | 1], tmp, mid);
+        int mid=(s+t)>>>1;
+        modify(pos<<1,s,mid,lazy[pos]);
+        modify(pos<<1|1,mid+1,t,lazy[pos]);
         lazy[pos]=initValue;
     }
     public void clear(){
         Arrays.fill(tree,initValue);
         Arrays.fill(lazy,initValue);
+    }
+    protected void modify(int p,int s,int t,int v){
+        tree[p]=updateInterval(tree[p],v,t-s+1);
+        lazy[p]=updateValue(lazy[p],v);
     }
     protected abstract int pushup(int left,int right);
     protected abstract int updateValue(int original,int val);

@@ -17,25 +17,25 @@ public abstract class SegTree {
     public void update(int pos,int val){
         update(1,pos,val,start,end);
     }
-    public int query(int start,int end){
-        return query(1,this.start,this.end,start,end);
+    public int query(int l,int r){
+        return query(1,start,end,l,r);
     }
-    protected void update(int cur,int pos,int val,int l,int r){
-        if(l==r){
+    protected void update(int cur,int pos,int val,int s,int t){
+        if(s==t){
             tree[cur]=updateValue(tree[cur],val);
             return;
         }
-        int mid=(l+r)>>>1;
-        if(mid<pos) update(cur<<1|1,pos,val,mid+1,r);
-        else update(cur<<1,pos,val,l,mid);
+        int mid=(s+t)>>>1;
+        if(mid<pos) update(cur<<1|1,pos,val,mid+1,t);
+        else update(cur<<1,pos,val,s,mid);
         tree[cur]=pushup(tree[cur<<1],tree[cur<<1|1]);
     }
-    protected int query(int pos,int l,int r,int start,int end){
-        if(l>=start&&r<=end)return tree[pos];
-        int mid=(l+r)>>>1;
+    protected int query(int pos,int s,int t,int l,int r){
+        if(s>=l&&t<=r)return tree[pos];
+        int mid=(s+t)>>>1;
         int ans=initValue;
-        if(start<=mid)ans=pushup(ans,query(pos<<1,l,mid,start,end));
-        if(end>mid)ans=pushup(ans,query(pos<<1|1,mid+1,r,start,end));
+        if(l<=mid)ans=pushup(ans,query(pos<<1,s,mid,l,r));
+        if(r>mid)ans=pushup(ans,query(pos<<1|1,mid+1,t,l,r));
         return ans;
     }
     public void clear(){

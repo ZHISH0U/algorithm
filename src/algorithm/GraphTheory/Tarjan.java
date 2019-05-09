@@ -33,16 +33,18 @@ public class Tarjan{
         vis[cur]=true;
         for(int p:edge[cur]){
             if(p==fa)continue;
-            //child++;
             if(dfn[p]==0){
+                //child++;
                 dfs(p,cur);
                 low[cur]=Math.min(low[cur],low[p]);
                 //if(low[p]>=dfn[cur]) iscut[cur]=true; 求割点，改为low[p]>dfn[cur]则为割边
             }else if(vis[p]){
+                //求割点割边去掉
                 low[cur]=Math.min(low[cur],low[p]);
             }
+            //}else low[cur]=Math.min(low[cur],dfn[p]); 求割点割边
         }
-
+        //求强联通分量/缩点
         if(low[cur]==dfn[cur]){
             num++;
             while(!st.isEmpty()&&low[st.peek()]==dfn[cur]){
