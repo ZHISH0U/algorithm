@@ -67,13 +67,26 @@ public class Splay{
         splay(cur,0);
     }
     void remove(int x){
-        int pre=lower(x),succ=higher(x);
-        splay(pre,0);splay(succ,pre);
-        int del=ch[0][succ];
-        if(cnt[del]>1){
-            cnt[del]--;
-            splay(del,0);
-        } else gc(del);
+        find(x);
+        if(val[root]!=x)return;
+        if(cnt[root]>1){
+            cnt[root]--;pushup(root);
+        }else if(ch[0][root]==0&&ch[1][root]==0){
+            gc(root);root=0;
+        }else if(ch[0][root]==0){
+            int y=root;
+            root=ch[1][root];fa[root]=0;
+            gc(y);
+        }else if(ch[1][root]==0){
+            int y=root;
+            root=ch[0][root];fa[root]=0;
+            gc(y);
+        }else {
+            int pre=lower(x),succ=higher(x);
+            splay(pre,0);splay(succ,pre);
+            gc(ch[0][succ]);
+            pushup(succ);pushup(pre);
+        }
     }
 
     int kth(int k){
@@ -116,6 +129,7 @@ public class Splay{
         return ch[0][fa[x]]==x?0:1;
     }
     void pushup(int x){
+        if(x==0)return;
         size[x]=size[ch[0][x]]+size[ch[1][x]]+cnt[x];
     }
 }
