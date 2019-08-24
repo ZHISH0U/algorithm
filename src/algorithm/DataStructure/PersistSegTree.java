@@ -20,7 +20,7 @@ public abstract class PersistSegTree {
         l=new int[size];
         r=new int[size];
         if(initValue!=0)Arrays.fill(val,initValue);
-        len=size=0;
+        len=this.size=0;
     }
     public int update(int pos,int val){
         return update(size,pos,val);

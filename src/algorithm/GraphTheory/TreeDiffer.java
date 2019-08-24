@@ -3,7 +3,7 @@ package algorithm.GraphTheory;
 import java.util.List;
 
 /**
- * 树上差分
+ * 树上差分，可用于求树上路径覆盖、新增路径后点的通路数量等问题。
  */
 public class TreeDiffer {
     TreeST st;

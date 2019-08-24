@@ -56,7 +56,7 @@ public class KMP {
      * @return source从i开始与pattern的最长公共前缀的长度
      */
     public static int[] ex_kmp(String source,String pattern){
-        final int slen= source.length(),plen= pattern.length();
+        int slen= source.length(),plen= pattern.length();
         int[]next=EX_KMPNext(pattern),extend=new int[slen];
         int i=0,j,pos=0;
         while(i<plen&&i<slen&&source.charAt(i)== pattern.charAt(i))i++;

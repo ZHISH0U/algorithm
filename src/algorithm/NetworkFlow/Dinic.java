@@ -22,7 +22,7 @@ public class Dinic {
     }
 
     public void init() {
-        int cnt=0;
+        cnt=0;
         Arrays.fill(head, -1);
     }
 

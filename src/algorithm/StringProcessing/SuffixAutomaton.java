@@ -5,86 +5,77 @@ package algorithm.StringProcessing;
  */
 public class SuffixAutomaton {
     private final char base='a';
-    private State root,strLast,topoLast;
-    private int size;
-    public SuffixAutomaton(){
-        topoLast=strLast=root = new State(0);
-        size=1;
+    private int root,strLast,topoLast,size;
+    private int[]length,endpos,link,topo;
+    int[][]next;
+    public SuffixAutomaton(int len){
+        length=new int[len];
+        endpos=new int[len];
+        link=new int[len];
+        topo=new int[len];
+        next=new int[26][len];
+        clear();
+    }
+    void clear(){
+        size=0;
+        topoLast=strLast=root=copy(0);
     }
     public SuffixAutomaton build(String s) {
         strLast=root;
-        for (char c : s.toCharArray()) put(c);
-   //     put(EndChar);//加入一个结尾字符，构建广义SAM时防止多个串连在一起
+        for (char c:s.toCharArray()) put(c-base);
         return this;
     }
-    public void put(char c){
-        State cur,p;//当前状态
-        if(strLast.contains(c)){
+    public void put(int c){
+        int cur,p;//当前状态
+        if(next[c][strLast]!=0){
             //广义SAM构建
-            cur=strLast.get(c);
-            if(strLast.length+1!=cur.length)
+            cur=next[c][strLast];
+            if(length[strLast]+1!=length[cur])
                 cur=addExtraState(strLast,c);
-            cur.endpos+=1;
+            endpos[cur]+=1;
         }else {
-            size++;
-            cur = new State(strLast.length + 1);
-            cur.topo = topoLast;
-            cur.endpos = 1;
-            for (p = strLast; p != null && !p.contains(c); p = p.link)
-                p.put(c, cur);
-            if (p != null){
-                State q = p.get(c);
-                if (p.length + 1 == q.length) {
-                    cur.link = q;
-                }else cur.link=addExtraState(p,c);
-            }else cur.link = root;
+            cur = copy(0);
+            length[cur]=length[strLast] + 1;
+            topo[cur] = topoLast;
+            endpos[cur] = 1;
+            for (p = strLast; p != 0 && next[c][p]==0; p = link[p])
+                next[c][p]=cur;
+            if (p != 0){
+                int q = next[c][p];
+                if (length[p] + 1 == length[q]) {
+                    link[cur] = q;
+                }else link[cur]=addExtraState(p,c);
+            }else link[cur] = root;
             topoLast=cur;
         }
         strLast = cur;
         //add(cur); //将cur及其link加入states
     }
-    public State addExtraState(State p,char c){
-        size++;
-        State q=p.get(c);
-        State clone = new State(q);
-        clone.length = p.length + 1;
-        for (; p != null && p.get(c) == q; p = p.link)
-            p.put(c, clone);
-        q.link=q.topo = clone;
-        //clone.endpos=q.endpos;   每次put都更新父节点的endpos需要添加这行代码
+    public int addExtraState(int p,int c){
+        int q=next[c][p];
+        int clone = copy(q);
+        length[clone] = length[p] + 1;
+        for (; p != 0 && next[c][p] == q; p = link[p])
+            next[c][p]=clone;
+        link[q]=topo[q] = clone;
+        //endpos[clone]=endpos[q];   每次put都更新父节点的endpos需要添加这行代码
         return clone;
     }
     public void buildEndpos(){
-        State cur=topoLast;
-        while(cur.topo!=null){
-            if(cur.link!=null)cur.link.endpos+=cur.endpos;
-            cur=cur.topo;
+        int cur=topoLast;
+        while(topo[cur]!=0){
+            if(link[cur]!=0)endpos[link[cur]]+=endpos[cur];
+            cur=topo[cur];
         }
     }
-    public State root(){
-        return root;
-    }
-    public class State {
-        int length,endpos=0;
-        State link,topo;//endpos集合的父集，拓扑序的前一个
-        private State[] next = new State[26];
-        public State(int len){
-            length=len;
-        }
-        public State(State copy){
-            link=copy.link;
-            next=copy.next.clone();
-            topo=copy.topo;
-        }
-        public State get(char c){
-            return next[c-base];
-        }
-        public void put(char c,State s){
-            next[c-base]=s;
-        }
-        public boolean contains(char c){
-            return next[c-base]!=null;
-        }
+    int copy(int a){
+        size++;
+        length[size]=endpos[size]=0;
+        link[size]=link[a];
+        topo[size]=topo[a];
+        for(int i=0;i<next.length;i++)
+            next[i][size] = next[i][a];
+        return size;
     }
 
 /*另一种构建拓扑序的方法
@@ -99,70 +90,6 @@ public class SuffixAutomaton {
         for(int i = 0; i < len; i++) sum[states[i].length]++;
         for(int i = 1; i <= MaxLen; i++) sum[i] += sum[i-1];
         for(int i = 0; i <len; i++) tp[--sum[states[i].length]] = temp[i];
-    }
-*/
-/*
-    // random tests
-    public static void main(String[] args) {
-        Random rnd = new Random(1);
-        for (int step = 0; step < 100000; step++) {
-
-            String res1 = lcs(s1, s2);
-            int res2 = slowLcs(s1, s2);
-            if (res1.length() != res2)
-                throw new RuntimeException();
-        }
-    }
-
-    static int bestState;
-
-    static String lcs(String a, String b) {
-        State[] st = buildSuffixAutomaton(a);
-        bestState = 0;
-        int len = 0;
-        int bestLen = 0;
-        int bestPos = -1;
-        for (int i = 0, cur = 0; i < b.length(); ++i) {
-            char c = b.charAt(i);
-            if (st[cur].next[c] == -1) {
-                for (; cur != -1 && st[cur].next[c] == -1; cur = st[cur].link) {
-                }
-                if (cur == -1) {
-                    cur = 0;
-                    len = 0;
-                    continue;
-                }
-                len = st[cur].length;
-            }
-            ++len;
-            cur = st[cur].next[c];
-            if (bestLen < len) {
-                bestLen = len;
-                bestPos = i;
-                bestState = cur;
-            }
-        }
-        return b.substring(bestPos - bestLen + 1, bestPos + 1);
-    }
-
-    static int[] occurrences(String haystack, String needle) {
-        String common = lcs(haystack, needle);
-        if (!common.equals(needle))
-            return new int[0];
-        List<Integer> list = new ArrayList<>();
-        dfs(buildSuffixAutomaton(haystack), bestState, needle.length(), list);
-        int[] res = new int[list.size()];
-        for (int i = 0; i < res.length; i++)
-            res[i] = list.get(i);
-        Arrays.sort(res);
-        return res;
-    }
-
-    static void dfs(State[] st, int p, int len, List<Integer> list) {
-        if (st[p].endpos != -1 || p == 0)
-            list.add(st[p].endpos - len + 1);
-        for (int x : st[p].ilink)
-            dfs(st, x, len, list);
     }
 */
 }
